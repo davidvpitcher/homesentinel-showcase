@@ -1,14 +1,23 @@
 # HomeSentinel engineering showcase
 
-Technical portfolio showcasing HomeSentinel's C#/.NET architecture, testing, and local-first Windows application design.
+**David Pitcher | Software Development Portfolio**
 
-**David Pitcher | Private review draft**
+HomeSentinel is my in-development, local-first Windows security-visibility application. This repository presents its engineering decisions through a case study and a runnable C#/.NET example. The full application, Windows collectors and private evidence store remain private.
 
-HomeSentinel is my in-development Windows security-visibility application. This repository presents a source-grounded case study and a small, runnable C# adaptation. It does **not** contain the full product, collectors, private evidence store or unreleased implementation plans.
+## What this sample demonstrates
 
-## Try the synthetic example
+| Engineering concern | Implementation |
+| --- | --- |
+| Separate evidence from decisions | Severity and review status have distinct meanings; filtering does not approve findings or change a baseline. |
+| Deterministic application logic | Stable severity/category/identity ordering, typed filters and explicit validation. |
+| Limited output | Response records contain only selected fields, excluding the synthetic private-evidence field. |
+| Testable boundaries | Cancellation, duplicate identities, invalid inputs and no-mutation checks. |
 
-With the .NET 10 SDK installed:
+Start with [ReviewProjection.cs](src/ReviewSample/ReviewProjection.cs), then the [30 executable contract tests](tests/ReviewSample.Tests/Program.cs). The [case study](docs/CASE-STUDY.md) explains the decisions and trade-offs.
+
+## Run the synthetic example
+
+With the **.NET 10 SDK** installed:
 
 ```bash
 dotnet build tests/ReviewSample.Tests/ReviewSample.Tests.csproj -c Release
@@ -16,37 +25,20 @@ dotnet run --project tests/ReviewSample.Tests -c Release --no-build
 dotnet run --project src/ReviewSample -c Release --no-build -- blockers
 ```
 
-The example runs without administrator permissions, WPF, a database, network access or NuGet packages. It creates five fictional findings in memory and returns a deterministic, privacy-limited JSON projection. It does not inspect your computer.
+This console example needs no administrator permissions, WPF, database, network connection or NuGet packages. It creates five fictional findings in memory and prints a JSON projection. **It does not inspect or modify your computer.**
 
-The `blockers` view should contain finding IDs `3, 2, 5`, with five total findings, three visible findings and three total baseline-refresh blockers. An expected high-severity finding does not become a blocker solely because of its severity. Conversely, an unreviewed low-severity finding still needs review.
+The `blockers` view returns finding IDs `3, 2, 5`: five total findings, three visible findings and three total baseline-refresh blockers. A high-severity finding marked expected is not automatically a blocker, while an unreviewed low-severity finding still needs review. Review state is not proof of safety.
 
-Other views: `all`, `unreviewed`, `reviewed`, `expected`. Unknown options return a nonzero exit.
+Other views: `all`, `unreviewed`, `reviewed`, `expected`. Unknown options return a nonzero exit. The test executable uses a small dependency-free assertion harness, not xUnit or the source application's test suite.
 
-## What this demonstrates
+## How it relates to the full application
 
-| Area | Evidence in this repository |
-| --- | --- |
-| Separation of responsibilities | Typed inputs, pure application projection and a minimal CLI. |
-| Explicit review semantics | Review states and baseline-refresh blockers remain separate from severity. |
-| Deterministic results | Stable severity/category/identity ordering without changing source rows. |
-| Privacy by construction | Output DTOs exclude private evidence rather than trying to redact serialized objects afterward. |
-| Testability | Dependency-free executable contract tests, boundary validation and cancellation. |
-| Honest scope | Synthetic output is not presented as a real scan or proof of safety. |
+The inspected HomeSentinel checkpoint separates Core, Collectors, Store, App, CLI and WPF presentation, with SQLite persistence and owner review. Its documentation records an owner-reported Windows milestone of **805/805 tests passing** and a successful WPF launch. That historical result is separate from the 30 showcase tests; this repository does not rerun or distribute the original suite.
 
-## Read the case study
+The current product focuses on one authorized Windows endpoint. Scans and bounded observations are not continuous security coverage. This sample demonstrates application logic, not the full WPF interface, endpoint protection or automatic remediation.
 
-[Architecture and decisions](docs/CASE-STUDY.md) · [Provenance and differences](docs/PROVENANCE.md) · [Validation](docs/VALIDATION.md) · [Publication review](docs/PUBLICATION-REVIEW.md)
+## Read more
 
-Start with `src/ReviewSample/ReviewProjection.cs`, then `tests/ReviewSample.Tests/Program.cs`. The test executable is a small assertion harness, not xUnit and not the source product's test suite.
+[Architecture and decisions](docs/CASE-STUDY.md) · [Provenance and adaptation](docs/PROVENANCE.md) · [Validation evidence](docs/VALIDATION.md) · [Validation workflow](https://github.com/davidvpitcher/homesentinel-showcase/actions/workflows/validate.yml)
 
-## Original project context
-
-The inspected source checkpoint documents a WPF GUI, CLI, Core, Collectors, Store and App layers, with SQLite persistence and owner review. Its README records an owner-reported Windows checkpoint of **805/805 tests passing** and a successful WPF launch. This repository did not rerun that original suite.
-
-HomeSentinel focuses on one authorized Windows endpoint. Scans and bounded Activity Watch observations are not continuous security coverage. This showcase does not claim enterprise endpoint protection, automatic remediation, multi-endpoint collection or a new product release.
-
-No real application screenshot is included yet. A future owner-approved demonstration can be added without publishing the complete source.
-
-## Review status
-
-The source repository remains private and unchanged. This adaptation also remains private pending owner approval. No reusable-source licence or public release has been approved. Technical walkthroughs can be arranged with selected material rather than unrestricted source access.
+No open-source licence has been granted. Contact the repository owner about reuse. The [publication and maintenance checklist](docs/PUBLICATION-REVIEW.md) describes the review required before changing visibility or adding source material. Selected technical walkthroughs can be arranged without unrestricted access to the private application.
